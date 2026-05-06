@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ドット冒険タイピングRPG</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="game-shell">
+    <section class="status-bar" aria-label="ゲーム情報">
+      <div class="brand-block">
+        <span>Pixel Typing Quest</span>
+        <strong>ドット冒険タイピングRPG</strong>
+      </div>
+      <div class="stat"><span>ステージ</span><strong id="stageLabel">1-1</strong></div>
+      <button class="top-shop-btn" id="topShopBtn" type="button">ショップ</button>
+      <div class="stat"><span>残り敵</span><strong id="enemyCount">0</strong></div>
+      <div class="stat"><span>コイン</span><strong id="points">0</strong></div>
+      <div class="stat"><span>装備</span><strong id="gearLabel">素手</strong></div>
+      <div class="stat"><span>ライフ</span><strong class="heart-life" id="lives">100%</strong></div>
+      <button class="control-btn sound-btn" id="soundBtn" type="button" aria-label="音を消す">♪</button>
+      <label class="volume-control" for="volumeSlider" aria-label="BGM音量">
+        <span>音量</span>
+        <input id="volumeSlider" type="range" min="0" max="100" value="75">
+      </label>
+      <button class="control-btn" id="restartBtn" type="button" aria-label="リスタート">↻</button>
+      <button class="control-btn" id="rulesBtn" type="button" aria-label="ルール説明">?</button>
+      <button class="control-btn" id="pauseBtn" type="button" aria-label="一時停止">II</button>
+    </section>
+
+    <section class="world-tabs" id="worldTabs" aria-label="ワールド選択"></section>
+
+    <section class="map-panel" id="stageMap" aria-label="ステージマップ"></section>
+
+    <section class="arena-wrap" aria-label="バトル画面">
+      <div class="pixel-map" aria-hidden="true">
+        <div class="tile grass"></div><div class="tile grass flowers"></div><div class="tile trees"></div><div class="tile trees"></div><div class="tile water"></div><div class="tile grass"></div><div class="tile sand"></div><div class="tile sand"></div>
+        <div class="tile hills"></div><div class="tile grass"></div><div class="tile grass"></div><div class="tile bridge"></div><div class="tile water"></div><div class="tile trees"></div><div class="tile grass"></div><div class="tile shrine"></div>
+        <div class="tile hills"></div><div class="tile grass"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile grass"></div><div class="tile grass"></div>
+        <div class="tile trees"></div><div class="tile potion"></div><div class="tile grass"></div><div class="tile cave"></div><div class="tile sword"></div><div class="tile grass"></div><div class="tile ship"></div><div class="tile grass"></div>
+        <div class="tile grass"></div><div class="tile grass flowers"></div><div class="tile water"></div><div class="tile rock"></div><div class="tile grass"></div><div class="tile bridge"></div><div class="tile castle"></div><div class="tile chest"></div>
+      </div>
+      <div class="laser-layer" id="laserLayer" aria-hidden="true"></div>
+      <div class="arena" id="arena" tabindex="0" aria-label="ゲーム画面"></div>
+      <div class="game-over-panel" id="gameOverPanel" aria-live="assertive" hidden>
+        <strong>GAME OVER</strong>
+        <span>敵に突破されました</span>
+        <button class="primary-btn" id="retryBtn" type="button">もう一度挑戦</button>
+      </div>
+      <div class="stage-clear-panel" id="stageClearPanel" aria-live="polite" hidden>
+        <strong>CLEAR!</strong>
+        <span id="clearRewardText">ステージクリア、おめでとう！</span>
+        <button class="primary-btn" id="clearNextBtn" type="button">次へ進む</button>
+      </div>
+      <div class="hero-stand" aria-hidden="true">
+        <div class="hero-avatar hero-adventurer outfit-plain weapon-none color-blue" id="heroAvatar">
+          <span class="shadow"></span>
+          <span class="head"></span>
+          <span class="hair"></span>
+          <span class="eye left"></span>
+          <span class="eye right"></span>
+          <span class="body"></span>
+          <span class="cape"></span>
+          <span class="weapon-icon"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="progress-panel" aria-label="ステージ進行">
+      <div>
+        <span class="group-title" id="questTitle">冒険ログ</span>
+        <p id="questText">ステージを選んで開始してください。</p>
+      </div>
+      <button class="primary-btn" id="startBtn" type="button">ステージ開始</button>
+      <button class="secondary-btn" id="nextStageBtn" type="button" disabled>次へ進む</button>
+    </section>
+
+    <section class="shop-panel collapsed" id="shopPanel" aria-label="アイテムショップ">
+      <button class="shop-copy" id="shopToggleBtn" type="button" aria-expanded="false">
+        <span class="group-title">アイテムショップ</span>
+        <p>コインで武器、銃、防具、服、靴、装飾品を買えます。主人公を豪華にして強化しましょう。</p>
+      </button>
+      <div class="shop-grid" id="shopGrid"></div>
+    </section>
+
+    <section class="loadout-panel" id="gearPanel" aria-label="装備"></section>
+
+    <section class="command-panel" aria-label="タイピング入力">
+      <div class="target-readout"><span>現在のターゲット</span><strong id="targetWord">START</strong></div>
+      <label class="type-box" for="typeInput">
+        <span>入力</span>
+        <input id="typeInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="敵のワードを入力して Enter">
+      </label>
+    </section>
+
+    <section class="feed" id="feed" aria-live="polite">
+      <p>ステージは1-1から5-10まで。各ワールドの5面は中ボス、10面はボスです。</p>
+    </section>
+
+    <div class="modal show" id="startModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-card">
+        <p class="kicker">Pixel Adventure</p>
+        <h1 id="modalTitle">ドット絵の島をタイピングで進め</h1>
+        <p id="modalText">まずは冒険のルールを確認しましょう。説明を開くと、上の「ゲームを始める」からステージを開始できます。</p>
+        <div class="modal-actions">
+          <button class="primary-btn game-start-btn" id="modalGameStartBtn" type="button" hidden>ゲームを始める</button>
+          <button class="secondary-btn" id="modalCloseRulesBtn" type="button" hidden>閉じる</button>
+          <button class="primary-btn" id="modalStartBtn" type="button">冒険を始める</button>
+        </div>
+        <section class="rules-panel" id="rulesPanel" aria-label="ルール説明" hidden>
+          <h2>ルール説明</h2>
+          <ul>
+            <li>敵の上に表示される英単語を入力して、Enterキーで攻撃します。</li>
+            <li>各ワールドは1-1から1-10まで進み、5面は中ボス、10面はボスです。</li>
+            <li>敵が勇者の近くまで来るとライフが減り、ライフが0になると再挑戦です。</li>
+            <li>ステージクリアごとにアイテム、装備、コインが手に入ります。</li>
+            <li>ショップでは武器、銃、防具、見た目装備を買って強化できます。</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
